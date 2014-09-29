@@ -8,7 +8,7 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
-PROJECT_HOME = os.path.join(os.path.abspath(__file__), "..", "..")
+PROJECT_HOME = os.path.abspath(os.path.join(os.path.abspath(__file__), "..", ".."))
 
 MANAGERS = ADMINS
 
@@ -138,7 +138,7 @@ INSTALLED_APPS = (
 # more details on how to customize your logging configuration.
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
@@ -149,13 +149,48 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(PROJECT_HOME, 'mysite.log'),
+            'formatter': 'verbose',
+        },
+        'null': {
+            'level': 'DEBUG',
+            'class': 'django.utils.log.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
     },
     'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
+        'loggers': {
+            'django': {
+                'handlers': ['null'],
+                'propagate': True,
+                'level': 'INFO',
+            },
+            'django.request': {
+                'handlers': ['mail_admins'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
+            'ajaxdemo': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+                'filters': ['require_debug_false']
+            }
+        }
     }
 }

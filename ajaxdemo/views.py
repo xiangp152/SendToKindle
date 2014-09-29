@@ -1,9 +1,10 @@
+# coding=utf-8
 # Create your views here.
-import os
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from mysite import settings
+from send_mail import *
 
 
 def handle_request(request):
@@ -25,13 +26,20 @@ def handle_get(request):
 
 
 def handle_uploaded_file(f):
-    file_path = os.path.join(os.path.abspath(settings.MEDIA_ROOT), f.name)
+    # media 不存在创建
+    media_path = os.path.abspath(settings.MEDIA_ROOT)
+    if not os.path.exists(media_path):
+        os.makedirs()
+
+    # 文件已存在则删除
+    file_path = os.path.join(media_path, f.name)
+    if os.path.exists(file_path):
+        os.remove(file_path)
     destination = open(file_path, 'wb+')
     for chunk in f.chunks():
         destination.write(chunk)
     destination.close()
-    os.remove(file_path)
+    # if is_mobi(file_path):
+    send_mail(file_path)
+    # os.remove(file_path)
 
-
-def send_mail():
-    pass
